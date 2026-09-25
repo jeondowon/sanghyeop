@@ -77,4 +77,4 @@ GitHub 원격 저장소는 [jeondowon/sanghyeop](https://github.com/jeondowon/sa
 
 현재 사이트에서 사용하지 않는 초기 React 시제품과 별도의 Git 기록이 담긴 `web/` 폴더는 삭제했습니다. 현재 배포에는 루트의 `index.html`, `stages/`, `assets/`를 사용했습니다.
 
-협업 및 구현 지침은 [AGENTS.md](AGENTS.md)를 참고해 주세요.
+협업 및 구현 지침은 로컬의 `AGENTS.md`를 참고해 주세요. 해당 파일은 Git 추적에서 제외했습니다.
