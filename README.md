@@ -1,54 +1,76 @@
-# Sanghyeop Lee — Portfolio
+# 이상협 — 포트폴리오
 
-A portfolio website for designer Sanghyeop Lee, developed in separate, reviewable stages. Each stage will remain available at its own link when the site is eventually deployed together.
+디자이너 이상협의 그림과 디자인 작업을 소개하는 포트폴리오 웹사이트를 제작했습니다. 사진만 있는 페이지부터 완성본까지 제작 과정을 7단계로 나누어 비교할 수 있도록 구성했습니다. 각 단계는 개별 주소로 열리며, 추후 하나의 사이트로 함께 배포할 수 있도록 구성했습니다.
 
-## Current Stage
+## 단계별 구성
 
-- `index.html`: links to the available development stages.
-- `stages/01-html/index.html`: the first portfolio version, written in plain semantic HTML.
-- Stage 01 includes the designer biography, project descriptions, all 42 selected artworks, and contact information.
-- It uses browser defaults with no CSS, inline styles, custom fonts, JavaScript, framework, or build step. Image links open larger display copies; the animation has its own link.
+루트의 `index.html`에서 각 단계로 이동할 수 있도록 링크를 추가했습니다.
 
-Later stages will add the intended design: a white background, Pretendard, black primary text, and gray secondary text. The visual reference is [Eimalive — Drawings Exhibition](https://eimalive.com/#drawings-exhibition).
+| 단계 | 폴더 | 주요 내용 |
+| --- | --- | --- |
+| 1. 사진만 | `stages/01-html/` | 화면에 보이는 텍스트와 링크 없이 프로필 사진과 작품 이미지만 배치했습니다. |
+| 2. 사진과 텍스트 | `stages/02-html-text/` | 작가 소개, 프로젝트 설명, 캡션, 연락처와 목차를 추가했습니다. |
+| 3. 기본 스타일 | `stages/03-style/` | Pretendard, 흰 배경, 검정·회색 텍스트, 글자 크기와 여백을 적용했습니다. |
+| 4. 화면 배치 | `stages/04-layout/` | 왼쪽에 고정된 작품 목록을, 오른쪽에 작품 내용을 배치했습니다. |
+| 5. 프로젝트별 화면 전환 | `stages/05-navigation/` | 선택한 프로젝트만 표시하는 화면 전환과 이전·다음 프로젝트 이동을 추가했습니다. |
+| 6. 갤러리 | `stages/06-gallery/` | 슬라이드, 썸네일, 전체 보기와 이미지 확대 보기를 추가했습니다. |
+| 7. 완성본 | `stages/07-final/` | 모바일 화면과 메뉴, 키보드·터치 조작, 포커스 처리와 이미지 로딩을 다듬었습니다. |
 
-## Local Preview
+2~4단계의 목차는 같은 페이지에서 해당 프로젝트 위치로 스크롤하는 HTML 링크로 구성했습니다. 5단계부터는 JavaScript로 다른 프로젝트를 숨기고 선택한 프로젝트만 보여주도록 구현했습니다.
 
-Run from the project root:
+1~2단계는 브라우저 기본 스타일을 사용했고, 3~4단계는 JavaScript 없이 CSS만 적용했습니다. 4~6단계는 데스크톱 화면에 맞춰 배치했으며, 7단계에서 모바일 대응을 추가했습니다.
+
+각 단계의 HTML·CSS·JavaScript는 별도로 관리하고, 작품 이미지와 글꼴만 공유하도록 구성했습니다. 프레임워크나 패키지 설치, 빌드 과정 없이 실행할 수 있도록 제작했습니다.
+
+## 디자인 방향
+
+- 참고 사이트: [Eimalive — Drawings Exhibition](https://eimalive.com/#drawings-exhibition)
+- 배경색: 흰색
+- 글꼴: Pretendard
+- 텍스트 색상: 기본 검정, 보조 정보는 필요에 따라 회색
+- 작품의 원래 비율을 유지하고 이미지가 잘리지 않도록 표시했습니다.
+
+위 스타일은 3단계부터 적용했습니다. Pretendard 파일과 라이선스는 `assets/fonts/`에 보관했습니다.
+
+## 로컬 미리보기
+
+루트의 `index.html`을 직접 열거나, 프로젝트 루트에서 다음 명령으로 로컬 서버를 실행해 주세요.
 
 ```sh
 python3 -m http.server 8000 --bind 127.0.0.1
 ```
 
-- Stage index: <http://127.0.0.1:8000/>
-- Plain HTML portfolio: <http://127.0.0.1:8000/stages/01-html/>
+- [단계별 목록](http://127.0.0.1:8000/)
+- [1단계: 사진만](http://127.0.0.1:8000/stages/01-html/)
+- [7단계: 완성본](http://127.0.0.1:8000/stages/07-final/)
 
-Use `127.0.0.1` explicitly: `localhost` may resolve to IPv6 and reach another server using the same port.
+`localhost`는 IPv6 주소로 연결되어 같은 포트의 다른 서버를 열 수 있으므로 `127.0.0.1`을 사용해 주세요. 저장소 하위 경로에 배포해도 사용할 수 있도록 파일 경로는 상대 경로로 작성했습니다.
 
-Both pages also work by opening their `index.html` files directly. All asset links are relative so the same structure can be hosted under a repository subpath.
+## 콘텐츠와 이미지
 
-## Content and Assets
+작가 소개와 프로젝트 제목·설명은 로컬의 `presentation.pdf`를 기준으로 작성했습니다. PDF 8쪽과 `작품이미지/`의 원본 파일 48개를 대조했습니다. 같은 작품의 해상도별 사본 6개는 큰 이미지로 통합하여 총 42점을 배치했습니다.
 
-The local `presentation.pdf` supplies the biography, project descriptions, titles, and image assignments. All 48 original files in `작품이미지/` were compared with its eight pages. Six alternate-resolution copies are represented by the larger version, producing 42 displayed artworks:
+- PDF에 소개된 9개 프로젝트의 작품: 19점
+- 마지막 ‘기타 작품’ 항목에 배치한 추가 작품: 23점
 
-- 19 artworks in the nine projects described in the PDF.
-- 23 additional artworks in the final Other Works section.
+텍스트가 있는 단계에서는 AI 생성 이미지임을 명시했습니다. 프로필 사진은 PDF 1쪽에서 추출했으며, 연락처는 `isanghyeob871@gmail.com`으로 반영했습니다.
 
-AI-generated images keep explicit labels. The profile portrait comes from PDF page 1.
+작품별 배치는 [이미지 배치 기록](docs/image-mapping.md)과 [원본 파일 목록](docs/asset-inventory.json)에 정리했습니다. 웹에 표시할 이미지는 `assets/artworks/`에 저장했으며, 7단계에서는 화면 크기에 따라 400·900·1800픽셀 사본을 선택하도록 구성했습니다.
 
-See [the image mapping](docs/image-mapping.md) and [the source inventory](docs/asset-inventory.json) for the assignments. Display assets live in `assets/artworks/`. The original PDF and artwork folder remain local and are excluded from Git; all images needed to display the site are included in the display assets.
+원본 PDF와 작품이미지 폴더는 로컬에 보존하고 Git에서는 제외했습니다. 웹사이트 표시에 필요한 이미지 사본은 저장소에 포함할 수 있도록 별도로 분리했습니다.
 
-The optional `scripts/prepare-assets.py` utility creates WebP display copies from the local originals using Python and Pillow. It is not needed to run the site. The existing portrait is preserved; regenerating it additionally requires extracting page 1 to `tmp/pdfs/portrait-000.jpg`.
+원본에서 WebP 사본을 만드는 보조 도구인 `scripts/prepare-assets.py`를 Python과 Pillow로 작성했습니다. 사이트는 이 도구 없이 실행할 수 있도록 구성했습니다. 프로필 사진을 다시 생성하려면 PDF 1쪽의 이미지를 `tmp/pdfs/portrait-000.jpg`로 추출해 주세요.
 
-## Stage Workflow
+## 작업 및 버전 관리
 
-1. Keep each stage in a separate folder under `stages/`.
-2. Preserve completed stages as examples of the development process.
-3. Add a link to each completed stage in the root `index.html`.
-4. Present changes for user review before committing.
-5. Commit, push, or deploy only after explicit user approval for that action.
+1. 각 단계는 `stages/` 아래의 개별 폴더로 관리해 주세요.
+2. 다음 단계를 추가할 때 이전 단계의 모습을 보존해 주세요.
+3. 루트의 `index.html`에 단계별 링크를 추가해 주세요.
+4. 변경 내용을 사용자에게 보여주고 커밋 전에 검토받아 주세요.
+5. 커밋·푸시·배포는 해당 작업에 대한 명시적인 승인 후 진행해 주세요.
 
-The GitHub remote is `https://github.com/jeondowon/sanghyeop.git`. The root repository has no commits yet. The intended first commit contains the unstyled HTML stage and its supporting assets and documentation.
+GitHub 원격 저장소는 [jeondowon/sanghyeop](https://github.com/jeondowon/sanghyeop)으로 연결했습니다.
 
-An earlier styled prototype and its separate local Git history remain in `web/`. That directory is excluded from this repository and is not part of the first commit or the stage index.
+이전에 만든 프레임워크 기반 시제품과 별도의 로컬 Git 기록은 `web/`에 보관했습니다. 해당 폴더는 루트 저장소와 단계별 목록에서 제외했으며, 현재 단계별 페이지는 이 폴더 없이 실행할 수 있도록 구성했습니다.
 
-See [AGENTS.md](AGENTS.md) for collaboration guidelines.
+협업 및 구현 지침은 [AGENTS.md](AGENTS.md)를 참고해 주세요.

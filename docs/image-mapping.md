@@ -33,7 +33,7 @@ The same artwork appears in multiple source files. The website displays the larg
 ## Content Notes
 
 - Page 1 supplies the designer biography, contact address, education, roles, certifications, software skills, and portrait. The portrait is extracted from the PDF; all artwork uses the supplied image folder.
-- Pages 2–4 form one VILLAIN UNIVERSE project. AI-generated imagery keeps explicit AI labels. The GIF matches the image on page 2. Stage 01 displays a still and provides a separate link to the animation.
+- Pages 2–4 form one VILLAIN UNIVERSE project. Stage 01 shows its images without visible labels. Stage 02 labels AI-generated imagery explicitly. The GIF matches the image on page 2; Stage 01 shows a still, while Stage 02 links to the animation.
 - The four FANTASY WARRIOR sketches match page 7 individually.
 - Unlisted images appear in the final OTHER WORKS section. Names such as ADSCENT, COURAGE, and SCARLET RED are visible in the artwork; no dates or client credits have been invented.
 - OTHER WORKS includes two AI expression sheets that are not shown in the PDF. They are labeled accordingly.
@@ -42,4 +42,4 @@ The same artwork appears in multiple source files. The website displays the larg
 
 ## Reference Structure
 
-The reference site uses a persistent left introduction/project index and a right project area with descriptions and image slideshows. Stage 01 establishes the content using plain HTML and section anchors. Later stages can adapt the reference layout and interactions. Reference imagery and text are not copied.
+The reference site uses a persistent left introduction/project index and a right project area with descriptions and image slideshows. Stage 01 presents the images alone. Stage 02 adds text and section anchors in plain HTML. Stages 03–07 progressively add typography, the two-column layout, project navigation, galleries, and mobile refinements. Each stage uses the same image assignments. Reference imagery and text are not copied.

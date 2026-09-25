@@ -4,7 +4,6 @@
 node_modules/
 dist/
 *.tsbuildinfo
-assets/artworks/*-900.webp
 .env
 .env.*
 
@@ -15,3 +14,7 @@ assets/artworks/*-900.webp
 /presentation.pdf
 /작품이미지/
 /작품이미지/
+
+#ai agents
+CLAUDE.md 
+AGENTS.md
