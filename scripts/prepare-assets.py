@@ -1,28 +1,78 @@
-"""Create web-sized copies; preserve all original portfolio files."""
+"""Create display copies using the stable IDs in docs/asset-inventory.json."""
+
+import json
+import shutil
+import unicodedata
 from pathlib import Path
+
 from PIL import Image, ImageOps
-import json, shutil, unicodedata
+
 ROOT = Path(__file__).resolve().parent.parent
-source = next(p for p in ROOT.iterdir() if p.is_dir() and unicodedata.normalize('NFC', p.name) == '작품이미지')
-files = sorted((p for p in source.iterdir() if p.suffix.lower() in ('.jpg', '.jpeg', '.png', '.gif')), key=lambda p: unicodedata.normalize('NFC', p.name))
-out = ROOT / 'assets/artworks'
-out.mkdir(parents=True, exist_ok=True)
-aliases = {4:16, 5:45, 7:44, 8:17, 9:15, 29:48}
-inventory = []
-for i, path in enumerate(files, 1):
-    original = ImageOps.exif_transpose(Image.open(path))
-    record = {'id': i, 'source': str(path.relative_to(ROOT)), 'width':original.width, 'height':original.height, 'displayId':aliases.get(i,i)}
-    inventory.append(record)
-    if i in aliases: continue
-    if path.suffix == '.gif': shutil.copy2(path, out / f'{i:02}.gif')
-    if original.mode in ('RGBA', 'LA') or 'transparency' in original.info:
-        canvas = Image.new('RGBA', original.size, 'white'); canvas.alpha_composite(original.convert('RGBA')); original = canvas.convert('RGB')
-    else: original = original.convert('RGB')
-    for size in (400, 900, 1800):
-        im = original.copy(); im.thumbnail((size,size), Image.Resampling.LANCZOS)
-        im.save(out / f'{i:02}-{size}.webp', 'WEBP', quality=88, method=6)
-(ROOT / 'docs/asset-inventory.json').write_text(json.dumps(inventory, ensure_ascii=False, indent=2)+'\n')
-portrait = ROOT / 'tmp/pdfs/portrait-000.jpg'
-if portrait.exists():
-    im=Image.open(portrait); im.thumbnail((700,700)); im.save(out / 'portrait.webp','WEBP',quality=90)
-print(f'Prepared {len(files)-len(aliases)} artwork images from {len(files)} source files.')
+IMAGE_EXTENSIONS = {'.jpg', '.jpeg', '.png', '.gif'}
+
+
+def normalize(value):
+    return unicodedata.normalize('NFC', value)
+
+
+def load_sources():
+    """Validate the complete source mapping before overwriting any display files."""
+    inventory = json.loads((ROOT / 'docs/asset-inventory.json').read_text())
+    folders = [p for p in ROOT.iterdir() if p.is_dir() and normalize(p.name) == '작품이미지']
+    if len(folders) != 1:
+        raise ValueError('Expected one original artwork folder named 작품이미지.')
+
+    sources = {
+        normalize(str(p.relative_to(ROOT))): p
+        for p in folders[0].iterdir()
+        if p.is_file() and p.suffix.lower() in IMAGE_EXTENSIONS
+    }
+    expected = {normalize(record['source']) for record in inventory}
+    ids = {record['id'] for record in inventory}
+    if len(expected) != len(inventory) or len(ids) != len(inventory):
+        raise ValueError('Duplicate source paths or artwork IDs in the inventory.')
+    if expected != sources.keys():
+        missing = sorted(expected - sources.keys())
+        unmapped = sorted(sources.keys() - expected)
+        raise ValueError(f'Update the image mapping before generating assets. Missing: {missing}; unmapped: {unmapped}')
+    display_ids = {record['id'] for record in inventory if record['id'] == record['displayId']}
+    if any(record['displayId'] not in display_ids for record in inventory):
+        raise ValueError('Every displayId must refer to a displayed original in the inventory.')
+    return inventory, sources
+
+
+def main():
+    inventory, sources = load_sources()
+    output = ROOT / 'assets/artworks'
+    output.mkdir(parents=True, exist_ok=True)
+    count = 0
+    for record in inventory:
+        if record['id'] != record['displayId']:
+            continue
+        path = sources[normalize(record['source'])]
+        with Image.open(path) as source:
+            original = ImageOps.exif_transpose(source)
+            if original.mode in ('RGBA', 'LA') or 'transparency' in original.info:
+                canvas = Image.new('RGBA', original.size, 'white')
+                canvas.alpha_composite(original.convert('RGBA'))
+                original = canvas.convert('RGB')
+            else:
+                original = original.convert('RGB')
+            for size in (400, 900, 1800):
+                image = original.copy()
+                image.thumbnail((size, size), Image.Resampling.LANCZOS)
+                image.save(output / f"{record['id']:02}-{size}.webp", 'WEBP', quality=88, method=6)
+        if path.suffix.lower() == '.gif':
+            shutil.copy2(path, output / f"{record['id']:02}.gif")
+        count += 1
+
+    portrait = ROOT / 'tmp/pdfs/portrait-000.jpg'
+    if portrait.exists():
+        with Image.open(portrait) as image:
+            image.thumbnail((700, 700))
+            image.save(output / 'portrait.webp', 'WEBP', quality=90)
+    print(f'Prepared {count} artwork images from {len(inventory)} source files.')
+
+
+if __name__ == '__main__':
+    main()

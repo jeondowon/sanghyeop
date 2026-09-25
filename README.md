@@ -63,6 +63,8 @@ python3 -m http.server 8000 --bind 127.0.0.1
 
 원본에서 WebP 사본을 만드는 보조 도구인 `scripts/prepare-assets.py`를 Python과 Pillow로 작성했습니다. 사이트는 이 도구 없이 실행할 수 있도록 구성했습니다. 프로필 사진을 다시 생성하려면 PDF 1쪽의 이미지를 `tmp/pdfs/portrait-000.jpg`로 추출해 주세요.
 
+이미지 변환에는 `docs/asset-inventory.json`에 기록된 작품 번호를 사용하도록 구성했습니다. 원본을 추가하거나 이름을 변경할 때는 이미지 배치 기록과 원본 파일 목록을 먼저 갱신해 주세요. 목록과 원본이 일치하지 않으면 기존 이미지 파일을 덮어쓰기 전에 중단하도록 처리했습니다.
+
 ## 작업 및 버전 관리
 
 1. 각 단계는 `stages/` 아래의 개별 폴더로 관리해 주세요.
@@ -73,6 +75,6 @@ python3 -m http.server 8000 --bind 127.0.0.1
 
 GitHub 원격 저장소는 [jeondowon/sanghyeop](https://github.com/jeondowon/sanghyeop)으로 연결했습니다.
 
-이전에 만든 프레임워크 기반 시제품과 별도의 로컬 Git 기록은 `web/`에 보관했습니다. 해당 폴더는 루트 저장소와 단계별 목록에서 제외했으며, 현재 단계별 페이지는 이 폴더 없이 실행할 수 있도록 구성했습니다.
+현재 사이트에서 사용하지 않는 초기 React 시제품과 별도의 Git 기록이 담긴 `web/` 폴더는 삭제했습니다. 현재 배포에는 루트의 `index.html`, `stages/`, `assets/`를 사용했습니다.
 
-협업 및 구현 지침은 [AGENTS.md](AGENTS.md)를 참고해 주세요.
+협업 및 구현 지침은 로컬의 `AGENTS.md`를 참고해 주세요. 해당 파일은 Git 추적에서 제외했습니다.

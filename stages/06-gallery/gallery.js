@@ -19,10 +19,11 @@
 
   function renderDialog() {
     const figure = openGallery.figures[openGallery.index];
-    dialogImage.src = figure.querySelector('.artwork-open').href;
+    const link = openGallery.links[openGallery.index];
+    dialogImage.src = link.href;
     dialogImage.alt = figure.dataset.title;
     dialogTitle.textContent = figure.dataset.title;
-    dialogProject.textContent = openGallery.element.closest('[data-panel]').dataset.title;
+    dialogProject.textContent = openGallery.panel.dataset.title;
     dialogCount.textContent = `${openGallery.index + 1} / ${openGallery.figures.length}`;
     dialogPrevious.hidden = dialogNext.hidden = openGallery.figures.length < 2;
   }
@@ -30,7 +31,10 @@
   class Gallery {
     constructor(element) {
       this.element = element;
+      this.panel = element.closest('[data-panel]');
       this.figures = [...element.querySelectorAll('[data-artwork]')];
+      this.links = this.figures.map(figure => figure.querySelector('.artwork-open'));
+      this.images = this.figures.map(figure => figure.querySelector('img'));
       this.index = 0;
       this.view = element.dataset.defaultView;
       const toolbar = document.createElement('div');
@@ -38,9 +42,9 @@
       const total = document.createElement('span');
       total.textContent = `${String(this.figures.length).padStart(2, '0')} ${this.figures.length === 1 ? 'Image' : 'Images'}`;
       toolbar.append(total);
-      this.slideButton = makeButton('슬라이드로 보기', '슬라이드', () => this.setView('slides'));
-      this.gridButton = makeButton('전체 이미지 보기', '전체 보기', () => this.setView('grid'));
       if (this.figures.length > 1) {
+        this.slideButton = makeButton('슬라이드로 보기', '슬라이드', () => this.setView('slides'));
+        this.gridButton = makeButton('전체 이미지 보기', '전체 보기', () => this.setView('grid'));
         const modes = document.createElement('div');
         modes.className = 'view-switch';
         modes.append(this.slideButton, this.gridButton);
@@ -62,22 +66,24 @@
       this.thumbnails = document.createElement('div');
       this.thumbnails.className = 'thumbnails';
       this.thumbnails.setAttribute('aria-label', '작품 이미지 선택');
-      this.thumbnailButtons = this.figures.map((figure, index) => {
+      this.thumbnailButtons = this.figures.length > 1 ? this.figures.map((figure, index) => {
         const thumbnail = makeButton(`${index + 1}. ${figure.dataset.title}`, '', () => this.select(index));
         const image = document.createElement('img');
-        image.src = figure.querySelector('img').getAttribute('src').replace('-1800.webp', '-400.webp');
+        image.src = this.images[index].getAttribute('src').replace('-1800.webp', '-400.webp');
         image.alt = '';
         image.loading = 'lazy';
         thumbnail.append(image);
         this.thumbnails.append(thumbnail);
-        figure.querySelector('.artwork-open').addEventListener('click', event => {
+        return thumbnail;
+      }) : [];
+      this.links.forEach((link, index) => {
+        link.addEventListener('click', event => {
           event.preventDefault();
           this.select(index);
           openGallery = this;
           renderDialog();
           dialog.showModal();
         });
-        return thumbnail;
       });
       element.append(this.controls, this.thumbnails);
       element.classList.add('gallery--enhanced');
@@ -94,13 +100,15 @@
       this.element.dataset.view = this.view;
       this.figures.forEach((figure, index) => { figure.hidden = this.view === 'slides' && index !== this.index; });
       this.counter.textContent = `${String(this.index + 1).padStart(2, '0')} / ${String(this.figures.length).padStart(2, '0')}`;
-      this.slideButton.setAttribute('aria-pressed', String(this.view === 'slides'));
-      this.gridButton.setAttribute('aria-pressed', String(this.view === 'grid'));
+      this.slideButton?.setAttribute('aria-pressed', String(this.view === 'slides'));
+      this.gridButton?.setAttribute('aria-pressed', String(this.view === 'grid'));
       this.controls.hidden = this.view === 'grid';
       this.thumbnails.hidden = this.view === 'grid' || this.figures.length < 2;
       this.thumbnailButtons.forEach((button, index) => button.setAttribute('aria-pressed', String(index === this.index)));
       const active = this.thumbnailButtons[this.index];
-      this.thumbnails.scrollTo({ left: Math.max(0, active.offsetLeft - this.thumbnails.clientWidth / 2 + active.clientWidth / 2), behavior: 'instant' });
+      if (active && !this.thumbnails.hidden && !this.panel.hidden) {
+        this.thumbnails.scrollTo({ left: Math.max(0, active.offsetLeft - this.thumbnails.clientWidth / 2 + active.clientWidth / 2), behavior: 'instant' });
+      }
     }
   }
 

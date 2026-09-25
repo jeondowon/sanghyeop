@@ -21,13 +21,14 @@
 
   function renderDialog() {
     const figure = openGallery.figures[openGallery.index];
-    const source = figure.querySelector('img');
+    const link = openGallery.links[openGallery.index];
+    const source = openGallery.images[openGallery.index];
     dialogImage.src = source.dataset.animation && !reducedMotion.matches
       ? source.dataset.animation
-      : figure.querySelector('.artwork-open').href;
+      : link.href;
     dialogImage.alt = figure.dataset.title;
     dialogTitle.textContent = figure.dataset.title;
-    dialogProject.textContent = openGallery.element.closest('[data-panel]').dataset.title;
+    dialogProject.textContent = openGallery.panel.dataset.title;
     dialogCount.textContent = `${openGallery.index + 1} / ${openGallery.figures.length}`;
     dialogPrevious.hidden = dialogNext.hidden = openGallery.figures.length < 2;
   }
@@ -35,11 +36,13 @@
   class Gallery {
     constructor(element) {
       this.element = element;
+      this.panel = element.closest('[data-panel]');
       this.figures = [...element.querySelectorAll('[data-artwork]')];
-      this.sources = this.figures.map(figure => {
-        const image = figure.querySelector('img');
-        return { image, src: image.getAttribute('src'), srcset: image.getAttribute('srcset') };
-      });
+      this.links = this.figures.map(figure => figure.querySelector('.artwork-open'));
+      this.images = this.figures.map(figure => figure.querySelector('img'));
+      this.sources = this.images.map(image => ({
+        image, src: image.getAttribute('src'), srcset: image.getAttribute('srcset'),
+      }));
       this.index = 0;
       this.view = element.dataset.defaultView;
       const toolbar = document.createElement('div');
@@ -47,9 +50,9 @@
       const total = document.createElement('span');
       total.textContent = `${String(this.figures.length).padStart(2, '0')} ${this.figures.length === 1 ? 'Image' : 'Images'}`;
       toolbar.append(total);
-      this.slideButton = makeButton('슬라이드로 보기', '슬라이드', () => this.setView('slides'));
-      this.gridButton = makeButton('전체 이미지 보기', '전체 보기', () => this.setView('grid'));
       if (this.figures.length > 1) {
+        this.slideButton = makeButton('슬라이드로 보기', '슬라이드', () => this.setView('slides'));
+        this.gridButton = makeButton('전체 이미지 보기', '전체 보기', () => this.setView('grid'));
         const modes = document.createElement('div');
         modes.className = 'view-switch';
         modes.append(this.slideButton, this.gridButton);
@@ -71,15 +74,18 @@
       this.thumbnails = document.createElement('div');
       this.thumbnails.className = 'thumbnails';
       this.thumbnails.setAttribute('aria-label', '작품 이미지 선택');
-      this.thumbnailButtons = this.figures.map((figure, index) => {
+      this.thumbnailButtons = this.figures.length > 1 ? this.figures.map((figure, index) => {
         const thumbnail = makeButton(`${index + 1}. ${figure.dataset.title}`, '', () => this.select(index));
         const image = document.createElement('img');
-        image.src = figure.querySelector('img').getAttribute('src').replace('-1800.webp', '-400.webp');
+        image.src = this.images[index].getAttribute('src').replace('-1800.webp', '-400.webp');
         image.alt = '';
         image.loading = 'lazy';
         thumbnail.append(image);
         this.thumbnails.append(thumbnail);
-        figure.querySelector('.artwork-open').addEventListener('click', event => {
+        return thumbnail;
+      }) : [];
+      this.links.forEach((link, index) => {
+        link.addEventListener('click', event => {
           event.preventDefault();
           if (this.suppressClick) return;
           this.select(index);
@@ -87,19 +93,18 @@
           renderDialog();
           dialog.showModal();
         });
-        return thumbnail;
       });
       element.append(this.controls, this.thumbnails);
       element.classList.add('gallery--enhanced');
       element.setAttribute('role', 'region');
-      element.setAttribute('aria-label', `${element.closest('[data-panel]').dataset.title} 이미지 갤러리`);
+      element.setAttribute('aria-label', `${this.panel.dataset.title} 이미지 갤러리`);
       element.addEventListener('keydown', event => {
         if (this.view !== 'slides' || this.figures.length < 2 || event.altKey || event.ctrlKey || event.metaKey) return;
         if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
           event.preventDefault();
           const focusImage = event.target.closest('.artwork-open');
           this.move(event.key === 'ArrowLeft' ? -1 : 1);
-          if (focusImage) this.figures[this.index].querySelector('.artwork-open').focus({ preventScroll: true });
+          if (focusImage) this.links[this.index].focus({ preventScroll: true });
         }
       });
       attachSwipe(element.querySelector('.gallery-items'), direction => {
@@ -111,18 +116,21 @@
       this.render();
     }
     updateImages() {
-      const visible = !this.element.closest('[data-panel]').hidden;
+      const visible = !this.panel.hidden;
       this.sources.forEach((source, index) => {
         const active = visible && this.view === 'slides' && index === this.index;
         const animate = active && source.image.dataset.animation && !reducedMotion.matches;
         if (animate) source.image.removeAttribute('srcset');
-        else if (source.srcset) source.image.setAttribute('srcset', source.srcset);
+        else if (source.srcset && source.image.getAttribute('srcset') !== source.srcset) {
+          source.image.setAttribute('srcset', source.srcset);
+        }
         const desired = animate ? source.image.dataset.animation : source.src;
         if (source.image.getAttribute('src') !== desired) source.image.setAttribute('src', desired);
-        source.image.sizes = this.view === 'grid'
+        const sizes = this.view === 'grid'
           ? '(max-width: 760px) 42vw, (max-width: 1100px) 28vw, 22vw'
           : '(max-width: 760px) calc(100vw - 40px), 65vw';
-        if (active) source.image.loading = 'eager';
+        if (source.image.sizes !== sizes) source.image.sizes = sizes;
+        source.image.loading = active ? 'eager' : 'lazy';
       });
     }
     setView(view) { this.view = view; this.render(); }
@@ -136,16 +144,18 @@
       this.element.dataset.view = this.view;
       if (this.view === 'slides') this.element.setAttribute('aria-roledescription', 'carousel');
       else this.element.removeAttribute('aria-roledescription');
-      this.updateImages();
       this.figures.forEach((figure, index) => { figure.hidden = this.view === 'slides' && index !== this.index; });
+      this.updateImages();
       this.counter.textContent = `${String(this.index + 1).padStart(2, '0')} / ${String(this.figures.length).padStart(2, '0')}`;
-      this.slideButton.setAttribute('aria-pressed', String(this.view === 'slides'));
-      this.gridButton.setAttribute('aria-pressed', String(this.view === 'grid'));
+      this.slideButton?.setAttribute('aria-pressed', String(this.view === 'slides'));
+      this.gridButton?.setAttribute('aria-pressed', String(this.view === 'grid'));
       this.controls.hidden = this.view === 'grid';
       this.thumbnails.hidden = this.view === 'grid' || this.figures.length < 2;
       this.thumbnailButtons.forEach((button, index) => button.setAttribute('aria-pressed', String(index === this.index)));
       const active = this.thumbnailButtons[this.index];
-      this.thumbnails.scrollTo({ left: Math.max(0, active.offsetLeft - this.thumbnails.clientWidth / 2 + active.clientWidth / 2), behavior: 'instant' });
+      if (active && !this.thumbnails.hidden && !this.panel.hidden) {
+        this.thumbnails.scrollTo({ left: Math.max(0, active.offsetLeft - this.thumbnails.clientWidth / 2 + active.clientWidth / 2), behavior: 'instant' });
+      }
     }
   }
 
@@ -176,8 +186,8 @@
     const gallery = openGallery;
     openGallery = null;
     dialogImage.removeAttribute('src');
-    if (gallery && !gallery.element.closest('[data-panel]').hidden) {
-      gallery.figures[gallery.index].querySelector('.artwork-open').focus({ preventScroll: true });
+    if (gallery && !gallery.panel.hidden) {
+      gallery.links[gallery.index].focus({ preventScroll: true });
     }
   });
   attachSwipe(dialog.querySelector('.lightbox-art'), direction => openGallery?.move(direction));

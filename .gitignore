@@ -7,14 +7,11 @@ dist/
 .env
 .env.*
 
-# Earlier styled prototype, including its separate local Git history
-/web/
-
 # Original reference materials; version the optimized display assets instead
 /presentation.pdf
 /작품이미지/
 /작품이미지/
 
-#ai agents
-CLAUDE.md 
+# Local agent instructions
+CLAUDE.md
 AGENTS.md
