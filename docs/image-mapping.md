@@ -46,7 +46,7 @@ The reference site uses a persistent left introduction/project index and a right
 
 ## Stage 08 revision — 2026-09-28
 
-Source: `수정사항.pdf`, all 5 pages, and the user's confirmation to merge **all four** existing FANTASY WARRIOR sketches, including the work-in-progress screen capture. The revision lives in `stages/08-style-revision/` (스타일 수정). Stage 07 retains the original draft (완성본(초안)); earlier stages and all source/display assets are preserved.
+Source: `수정사항.pdf`, all 5 pages, and the user's confirmation to merge **all four** existing FANTASY WARRIOR sketches, including the work-in-progress screen capture. The revision lives in `stages/08-style-revision/` (스타일 수정01). Stage 07 retains the original draft (완성본(초안)); earlier stages and all source/display assets are preserved.
 
 | Section | Display IDs | Revision |
 | --- | --- | --- |
