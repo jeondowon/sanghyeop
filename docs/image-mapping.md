@@ -42,4 +42,31 @@ The same artwork appears in multiple source files. The website displays the larg
 
 ## Reference Structure
 
-The reference site uses a persistent left introduction/project index and a right project area with descriptions and image slideshows. Stage 01 presents the images alone. Stage 02 adds text and section anchors in plain HTML. Stages 03–07 progressively add typography, the two-column layout, project navigation, galleries, and mobile refinements. Each stage uses the same image assignments. Reference imagery and text are not copied.
+The reference site uses a persistent left introduction/project index and a right project area with descriptions and image slideshows. Stage 01 presents the images alone. Stage 02 adds text and section anchors in plain HTML. Stages 03–07 progressively add typography, the two-column layout, project navigation, galleries, and mobile refinements. Stages 01–07 use the original image assignments. Stages 08–09 follow the revision record below. Reference imagery and text are not copied.
+
+## Stage 08 revision — 2026-09-28
+
+Source: `수정사항.pdf`, all 5 pages, and the user's confirmation to merge **all four** existing FANTASY WARRIOR sketches, including the work-in-progress screen capture. The revision lives in `stages/08-style-revision/` (스타일 수정). Stage 07 retains the original draft (완성본(초안)); earlier stages and all source/display assets are preserved.
+
+| Section | Display IDs | Revision |
+| --- | --- | --- |
+| VILLAIN UNIVERSE | 44, 45, 06 | Each artwork has its own gallery: full composition plus three detail views. |
+| VILLAIN UNIVERSE — AI Image Generation | 25, 15, 17, 14, 16 | Group the motion study and AI imagery separately, with explicit AI labels. |
+| FRIEREN / PAIN / AKAZA / ORIGINAL CHARACTER | 24 / 11 / 03 / 46 | Retain each project, with three detail views per artwork. |
+| CHWIRAM BLUE / DEMON OF THE BATTLEFIELD / IMAGE EXPERIMENTATION | 28 / 42 / 47 | Retain each project, with three detail views per artwork. |
+| OTHER WORKS — sketches | 21, 20, 23, 19 | Move all four sketches here; remove the standalone FANTASY WARRIOR menu entry. Keep its old hash usable. |
+| OTHER WORKS — graphic poster | 43 | Retain SCARLET RED, with three detail views. |
+| OTHER WORKS — AI Expression Study | 12, 13 | Retain together, with explicit AI labels. |
+
+Excluded from Stages 08–09 only:
+
+- IDs 22 and 18: armored angel and unfinished Miku.
+- IDs 01 and 02: the two character works pictured for removal on revision page 3.
+- IDs 26 and 27: ADSCENT brand design.
+- IDs 48, 10, and 30–41: COURAGE digital editorial design.
+
+The final selection contains 22 distinct artworks: 15 original artworks and 7 AI/motion images, plus the portrait. The 15 original artworks each have three detail views (45 in total). Detail coordinates are stored in each figure's `data-detail-views` in Stage 08 HTML as normalized `[x, y, width, height]` rectangles, and rendered with SVG viewports using the existing WebP assets. No pixels are regenerated, no originals are cropped or overwritten, and detail views are not counted as additional artworks.
+
+## Stage 09 layout and interaction revision
+
+`stages/09-layout-interaction/` retains Stage 08’s 22 artworks and the same 45 detail rectangles. It moves the complete About profile to the left beside the project list, enlarges the portrait, places normal gallery arrows beside the artwork, adds directional slide transitions, and closes the lightbox when its image is clicked again. Lightbox arrows remain below the image. Stage 08 preserves the original PDF revision before these follow-up changes.
