@@ -9,7 +9,7 @@
   let stopDialogSlide = null;
   let dialogSuppressClickUntil = 0;
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-  const galleries = [];
+  const galleries = new Map();
 
   function makeButton(label, text, onClick) {
     const button = document.createElement('button');
@@ -18,6 +18,13 @@
     button.textContent = text;
     button.addEventListener('click', onClick);
     return button;
+  }
+
+  function getArrowStep(event) {
+    if (event.altKey || event.ctrlKey || event.metaKey) return 0;
+    if (event.key === 'ArrowLeft') return -1;
+    if (event.key === 'ArrowRight') return 1;
+    return 0;
   }
 
   function slideArtwork(container, image, previous, direction) {
@@ -120,6 +127,17 @@
       }));
       this.index = 0;
       this.view = element.dataset.defaultView;
+      this.items = element.querySelector('.gallery-items');
+      this.createToolbar();
+      this.createControls();
+      this.bindEvents();
+      element.classList.add('gallery--enhanced');
+      element.setAttribute('role', 'region');
+      element.setAttribute('aria-label', `${element.dataset.label} 이미지 갤러리`);
+      this.render();
+    }
+
+    createToolbar() {
       const toolbar = document.createElement('div');
       toolbar.className = 'gallery-toolbar';
       const modes = document.createElement('div');
@@ -133,15 +151,16 @@
       }
       modes.append(this.zoomButton);
       toolbar.append(modes);
-      element.prepend(toolbar);
+      this.element.prepend(toolbar);
+    }
 
+    createControls() {
       this.controls = document.createElement('div');
       this.controls.className = 'gallery-controls';
-      const items = element.querySelector('.gallery-items');
-      this.viewport = document.createElement('div');
-      this.viewport.className = 'gallery-viewport';
-      items.replaceWith(this.viewport);
-      this.viewport.append(items);
+      const viewport = document.createElement('div');
+      viewport.className = 'gallery-viewport';
+      this.items.replaceWith(viewport);
+      viewport.append(this.items);
       this.arrows = [];
       if (this.figures.length > 1) {
         const previous = makeButton('이전 이미지', '←', () => this.move(-1));
@@ -149,12 +168,16 @@
         previous.className = 'gallery-arrow gallery-arrow--previous';
         next.className = 'gallery-arrow gallery-arrow--next';
         this.arrows.push(previous, next);
-        this.viewport.append(previous, next);
+        viewport.append(previous, next);
       }
       this.counter = document.createElement('span');
       this.counter.setAttribute('aria-live', 'polite');
       this.counter.setAttribute('aria-atomic', 'true');
       this.controls.append(this.counter);
+      this.element.append(this.controls);
+    }
+
+    bindEvents() {
       this.links.forEach((link, index) => {
         link.addEventListener('click', event => {
           event.preventDefault();
@@ -162,26 +185,21 @@
           this.open(index);
         });
       });
-      element.append(this.controls);
-      element.classList.add('gallery--enhanced');
-      element.setAttribute('role', 'region');
-      element.setAttribute('aria-label', `${element.dataset.label} 이미지 갤러리`);
-      element.addEventListener('keydown', event => {
-        if (this.view !== 'slides' || this.figures.length < 2 || event.altKey || event.ctrlKey || event.metaKey) return;
-        if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
-          event.preventDefault();
-          const focusImage = event.target.closest('.artwork-open');
-          this.move(event.key === 'ArrowLeft' ? -1 : 1);
-          if (focusImage) this.links[this.index].focus({ preventScroll: true });
-        }
+      this.element.addEventListener('keydown', event => {
+        const step = getArrowStep(event);
+        if (!step || this.view !== 'slides' || this.figures.length < 2) return;
+        event.preventDefault();
+        const focusImage = event.target.closest('.artwork-open');
+        this.move(step);
+        if (focusImage) this.links[this.index].focus({ preventScroll: true });
       });
-      attachSwipe(element.querySelector('.gallery-items'), direction => {
+      attachSwipe(this.items, direction => {
         if (this.view !== 'slides' || this.figures.length < 2) return;
         this.suppressClickUntil = Date.now() + 350;
         this.move(direction);
       });
-      this.render();
     }
+
     open(index = this.index, trigger = null) {
       this.select(index);
       this.dialogTrigger = trigger;
@@ -191,6 +209,9 @@
     }
     updateImages() {
       const visible = this.inViewport;
+      const sizes = this.view === 'grid'
+        ? '(max-width: 760px) 42vw, (max-width: 1100px) 28vw, 30vw'
+        : '(max-width: 760px) calc(100vw - 40px), 60vw';
       this.sources.forEach((source, index) => {
         const active = visible && this.view === 'slides' && index === this.index;
         if (source.image.tagName !== 'IMG') {
@@ -207,9 +228,6 @@
         }
         const desired = animate ? source.image.dataset.animation : source.src;
         if (source.image.getAttribute('src') !== desired) source.image.setAttribute('src', desired);
-        const sizes = this.view === 'grid'
-          ? '(max-width: 760px) 42vw, (max-width: 1100px) 28vw, 30vw'
-          : '(max-width: 760px) calc(100vw - 40px), 60vw';
         if (source.image.sizes !== sizes) source.image.sizes = sizes;
         source.image.loading = active || source.image.fetchPriority === 'high' ? 'eager' : 'lazy';
       });
@@ -226,7 +244,7 @@
       this.index = index;
       this.render();
       if (dialog.open && openGallery === this) renderDialog(direction);
-      else if (this.view === 'slides' && !this.panel.hidden) {
+      else if (this.view === 'slides') {
         this.stopSlide = slideArtwork(this.links[index], this.images[index], previous, direction);
       }
     }
@@ -260,28 +278,27 @@
     }, { passive: true });
   }
 
-  document.querySelectorAll('[data-gallery]').forEach(element => galleries.push(new Gallery(element)));
+  document.querySelectorAll('[data-gallery]').forEach(element => galleries.set(element, new Gallery(element)));
   const galleryObserver = new IntersectionObserver(entries => {
     entries.forEach(entry => {
-      const gallery = galleries.find(item => item.element === entry.target);
+      const gallery = galleries.get(entry.target);
       gallery.inViewport = entry.isIntersecting;
       gallery.updateImages();
     });
   }, { rootMargin: '200px 0px' });
   galleries.forEach(gallery => galleryObserver.observe(gallery.element));
   dialog.addEventListener('keydown', event => {
-    if (!openGallery || event.altKey || event.ctrlKey || event.metaKey) return;
-    if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
-      event.preventDefault();
-      openGallery.move(event.key === 'ArrowLeft' ? -1 : 1);
-    }
+    const step = getArrowStep(event);
+    if (!openGallery || !step) return;
+    event.preventDefault();
+    openGallery.move(step);
   });
   dialog.addEventListener('close', () => {
     stopDialogSlide?.();
     const gallery = openGallery;
     openGallery = null;
     dialogArt.replaceChildren();
-    if (gallery && !gallery.panel.hidden) {
+    if (gallery) {
       (gallery.dialogTrigger || gallery.links[gallery.index]).focus({ preventScroll: true });
     }
   });
