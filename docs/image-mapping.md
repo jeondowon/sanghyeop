@@ -36,13 +36,13 @@ The same artwork appears in multiple source files. The website displays the larg
 - Pages 2–4 form one VILLAIN UNIVERSE project. Stage 01 shows its images without visible labels. Stage 02 labels AI-generated imagery explicitly. The GIF matches the image on page 2; Stage 01 shows a still, while Stage 02 links to the animation.
 - The four FANTASY WARRIOR sketches match page 7 individually.
 - Unlisted images appear in the final OTHER WORKS section. Names such as ADSCENT, COURAGE, and SCARLET RED are visible in the artwork; no dates or client credits have been invented.
-- OTHER WORKS includes two AI expression sheets that are not shown in the PDF. They are labeled accordingly.
+- In Stages 01–09, OTHER WORKS includes two AI expression sheets that are not shown in the PDF. Stage 10 moves them into VILLAIN UNIVERSE at the user’s request, retaining explicit AI labels.
 - 48 source files resolve to 42 displayed artworks (19 matching the PDF and 23 additional works), plus the portrait.
 - `asset-inventory.json` records each original file and its selected display ID.
 
 ## Reference Structure
 
-The reference site uses a persistent left introduction/project index and a right project area with descriptions and image slideshows. Stage 01 presents the images alone. Stage 02 adds text and section anchors in plain HTML. Stages 03–07 progressively add typography, the two-column layout, project navigation, galleries, and mobile refinements. Stages 01–07 use the original image assignments. Stages 08–09 follow the revision record below. Reference imagery and text are not copied.
+The reference site uses a persistent left introduction/project index and a right project area with descriptions and image slideshows. Stage 01 presents the images alone. Stage 02 adds text and section anchors in plain HTML. Stages 03–07 progressively add typography, the two-column layout, project navigation, galleries, and mobile refinements. Stages 01–07 use the original image assignments. Stages 08–10 follow the revision record below. Reference imagery and text are not copied.
 
 ## Stage 08 revision — 2026-09-28
 
@@ -58,10 +58,10 @@ Source: `수정사항.pdf`, all 5 pages, and the user's confirmation to merge **
 | OTHER WORKS — graphic poster | 43 | Retain SCARLET RED, with three detail views. |
 | OTHER WORKS — AI Expression Study | 12, 13 | Retain together, with explicit AI labels. |
 
-Excluded from Stages 08–09 only:
+Excluded from Stages 08–10 only:
 
 - IDs 22 and 18: armored angel and unfinished Miku.
-- IDs 01 and 02: the two character works pictured for removal on revision page 3.
+- IDs 01 and 02: excluded from Stages 08–09 per revision page 3, then restored to OTHER WORKS in Stage 10 at the user’s request.
 - IDs 26 and 27: ADSCENT brand design.
 - IDs 48, 10, and 30–41: COURAGE digital editorial design.
 
@@ -70,3 +70,9 @@ The final selection contains 22 distinct artworks: 15 original artworks and 7 AI
 ## Stage 09 layout and interaction revision
 
 `stages/09-layout-interaction/` retains Stage 08’s 22 artworks and the same 45 detail rectangles. It moves the complete About profile to the left beside the project list, enlarges the portrait, places normal gallery arrows beside the artwork, adds directional slide transitions, and closes the lightbox when its image is clicked again. Lightbox arrows remain below the image. Stage 08 preserves the original PDF revision before these follow-up changes.
+
+## Stage 10 continuous scrolling
+
+`stages/10-full-scroll/` keeps Stage 09’s 22 artworks and restores IDs 01 and 02, totaling 24 artworks and 51 detail rectangles. All projects appear in one continuous page, with smooth anchor navigation from the project list. Contact moves to the end of About, image transitions last one second, and the process-index link moves to the top-right of the portfolio. Stage 09 preserves the preceding committed layout and interaction version.
+
+Stage 10 artwork regrouping: at the user’s request, AI expression sheets **12 and 13** move from OTHER WORKS to the end of VILLAIN UNIVERSE’s **AI Image Generation** gallery. That gallery now contains IDs **25, 15, 17, 14, 16, 12, 13** (7 images). OTHER WORKS now contains IDs **02, 43, 01, 21, 20, 23, 19** (7 artworks), including the restored character line drawing and color illustration requested by the user. ID **01**, titled **Character Line Art**, sits immediately before the four sketches; ID **02** is titled **Character Illustration — 02**. These English titles are used consistently in headings, gallery labels, and lightbox artwork metadata. Both restored works have three detail views, retaining the original artwork files. The portfolio now contains 24 distinct artworks (17 original artworks and 7 AI/motion images); Stages 01–09 and original assets are unchanged.
