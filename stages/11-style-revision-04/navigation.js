@@ -2,11 +2,6 @@
   const projects = [...document.querySelectorAll('[data-panel]')];
   const links = [...document.querySelectorAll('[data-project-link]')];
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-  const mobileLayout = window.matchMedia('(max-width: 1000px)');
-  const bioDetails = document.querySelector('.bio-details');
-  function updateBioLayout() { bioDetails.open = !mobileLayout.matches; }
-  mobileLayout.addEventListener('change', updateBioLayout);
-  updateBioLayout();
   let currentProject = null;
   let scrollFrame = null;
 

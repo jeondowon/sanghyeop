@@ -212,6 +212,10 @@
       this.arrows = [];
       viewport.classList.toggle('has-slides', this.figures.length > 1);
       if (this.figures.length > 1) {
+        const tallestRatio = Math.max(...this.images.map(image =>
+          Number(image.getAttribute('height')) / Number(image.getAttribute('width'))
+        ));
+        viewport.style.setProperty('--tallest-image-ratio', tallestRatio);
         const previous = makeButton('이전 이미지', '←', () => this.move(-1));
         const next = makeButton('다음 이미지', '→', () => this.move(1));
         previous.className = 'gallery-arrow gallery-arrow--previous';
