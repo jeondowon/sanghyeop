@@ -53,6 +53,7 @@ a:hover { text-decoration: underline; text-underline-offset: 4px; }
 .about { min-width: 0; }
 .about-intro { margin-bottom: 16px; }
 .about-intro p { margin: 0 0 12px; }
+.description-en { margin-top: 10px !important; color: #666; word-break: normal; }
 .bio-section { display: grid; gap: 6px; padding: 12px 0; border-top: 1px solid #ddd; overflow-wrap: anywhere; }
 .bio-section h3 { margin: 0; }
 .bio-section p { margin: 0 0 10px; }
